@@ -23,7 +23,7 @@ public class BankAccountTest {
     StatementPrinting statementPrinting;
 
     @Test
-    public void givenAmount_whenDeposit_thenRecordTransaction() throws MinimumAmountAllowedException {
+    public void givenAmount_whenDeposit_thenRecordOperation() throws MinimumAmountAllowedException {
         BankAccount bankAccount = new BankAccount(operationsRecord, statementPrinting);
         LocalDateTime currentDate = LocalDateTime.now();
         var amount = new Amount(500);
