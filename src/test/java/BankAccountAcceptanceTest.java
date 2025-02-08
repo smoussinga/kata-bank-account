@@ -11,11 +11,14 @@ import static org.mockito.Mockito.verify;
 public class BankAccountAcceptanceTest {
 
     @Mock
+    OperationsRecord operationsRecord;
+
+    @Mock
     StatementPrinting statementPrinting;
 
     @Test
-    public void should_print_a_statement_with_all_withdrawal_operations(){
-        Account bankAccount = new BankAccount(statementPrinting);
+    public void should_print_a_statement_with_all_withdrawal_operations() {
+        Account bankAccount = new BankAccount(operationsRecord, statementPrinting);
 
         bankAccount.deposit(BigDecimal.valueOf(2000));
         bankAccount.deposit(BigDecimal.valueOf(1000.00));
