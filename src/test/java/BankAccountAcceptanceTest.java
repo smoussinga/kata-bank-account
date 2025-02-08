@@ -5,6 +5,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.verify;
 
@@ -28,13 +33,14 @@ public class BankAccountAcceptanceTest {
 
         bankAccount.printStatement();
 
-        String statements = "   Date    ||  Amount || Balance\n" +
-                "05/02/2025 || 1500.50 || 5001.00\n" +
-                "04/02/2025 || 500.50  || 3500.50\n" +
-                "03/02/2025 || 1000.00 || 3000.00\n" +
-                "01/02/2025 || 2000.00 || 2000.00\n";
+        LocalDateTime dateTime = LocalDate.of(2025, Month.FEBRUARY, 1).atStartOfDay();
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new Operation(dateTime, new Amount(2000)));
+        operations.add(new Operation(dateTime.plusDays(2), new Amount(1000)));
+        operations.add(new Operation(dateTime.plusDays(3), new Amount(BigDecimal.valueOf(500.50))));
+        operations.add(new Operation(dateTime.plusDays(4), new Amount(BigDecimal.valueOf(1500.50))));
 
-        verify(statementPrinting).printStatement(statements);
+        verify(statementPrinting).printStatement(operations);
 
     }
 
