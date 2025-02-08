@@ -26,7 +26,7 @@ public class BankAccountTest {
     public void givenAmount_whenDeposit_thenRecordTransaction() throws MinimumAmountAllowedException {
         BankAccount bankAccount = new BankAccount(operationsRecord, statementPrinting);
         LocalDateTime currentDate = LocalDateTime.now();
-        var amount = new BigDecimal("500.00");
+        var amount = new Amount(500);
 
         try (MockedStatic<LocalDateTime> dateTimeMockedStatic = Mockito.mockStatic(LocalDateTime.class)) {
             dateTimeMockedStatic.when(LocalDateTime::now).thenReturn(currentDate);
@@ -41,7 +41,7 @@ public class BankAccountTest {
     @Test
     void givenAmountZero_whenMinimumAmountAllowedExceptionThrown_thenAssertionSucceeds() {
         BankAccount bankAccount = new BankAccount(operationsRecord, statementPrinting);
-        var amount = new BigDecimal("0");
+        var amount = new Amount(0);
 
         Exception exception = assertThrows(MinimumAmountAllowedException.class, () -> bankAccount.deposit(amount));
 

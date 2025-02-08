@@ -21,10 +21,10 @@ public class BankAccountAcceptanceTest {
     public void should_print_a_statement_with_all_withdrawal_operations() throws MinimumAmountAllowedException {
         Account bankAccount = new BankAccount(operationsRecord, statementPrinting);
 
-        bankAccount.deposit(BigDecimal.valueOf(2000));
-        bankAccount.deposit(BigDecimal.valueOf(1000.00));
-        bankAccount.deposit(BigDecimal.valueOf(500.50));
-        bankAccount.deposit(BigDecimal.valueOf(1500.50));
+        bankAccount.deposit(Amount.toAmount(2000));
+        bankAccount.deposit(Amount.toAmount(BigDecimal.valueOf(1000.00)));
+        bankAccount.deposit(Amount.toAmount(BigDecimal.valueOf(500.50)));
+        bankAccount.deposit(Amount.toAmount(BigDecimal.valueOf(1500.50)));
 
         bankAccount.printStatement();
 

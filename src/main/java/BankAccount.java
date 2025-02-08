@@ -14,8 +14,8 @@ public class BankAccount implements Account {
     }
 
     @Override
-    public void deposit(BigDecimal amount) throws MinimumAmountAllowedException {
-        if(isNotValidMinimumAmount(amount)){
+    public void deposit(Amount amount) throws MinimumAmountAllowedException {
+        if(isNotValidMinimumAmount(amount.getAmountValue())){
             throw new MinimumAmountAllowedException();
         }
         recordOperation(amount);
@@ -29,7 +29,7 @@ public class BankAccount implements Account {
         return amount.abs().compareTo(BigDecimal.ZERO) == 0;
     }
 
-    private void recordOperation(BigDecimal amount) {
+    private void recordOperation(Amount amount) {
         var operation = new Operation(LocalDateTime.now(), amount);
         operationsRecord.recordOperation(operation);
     }

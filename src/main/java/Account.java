@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public interface Account {
 
-    void deposit(BigDecimal amount) throws MinimumAmountAllowedException;
+    void deposit(Amount amount) throws MinimumAmountAllowedException;
     void printStatement();
 
 }
