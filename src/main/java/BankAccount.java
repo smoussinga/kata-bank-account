@@ -1,3 +1,5 @@
+import exceptions.MinimumAmountAllowedException;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -12,12 +14,19 @@ public class BankAccount implements Account {
     }
 
     @Override
-    public void deposit(BigDecimal amount) {
+    public void deposit(BigDecimal amount) throws MinimumAmountAllowedException {
+        if(isNotValidMinimumAmount(amount)){
+            throw new MinimumAmountAllowedException();
+        }
         recordOperation(amount);
     }
 
     @Override
     public void printStatement() {
+    }
+
+    private boolean isNotValidMinimumAmount(BigDecimal amount){
+        return amount.abs().compareTo(BigDecimal.ZERO) == 0;
     }
 
     private void recordOperation(BigDecimal amount) {

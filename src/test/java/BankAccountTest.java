@@ -1,3 +1,4 @@
+import exceptions.MinimumAmountAllowedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -8,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
@@ -21,7 +23,7 @@ public class BankAccountTest {
     StatementPrinting statementPrinting;
 
     @Test
-    public void givenAmount_whenDeposit_thenRecordTransaction() {
+    public void givenAmount_whenDeposit_thenRecordTransaction() throws MinimumAmountAllowedException {
         BankAccount bankAccount = new BankAccount(operationsRecord, statementPrinting);
         LocalDateTime currentDate = LocalDateTime.now();
         var amount = new BigDecimal("500.00");
@@ -34,5 +36,17 @@ public class BankAccountTest {
             var depositOperation = new Operation(LocalDateTime.now(), amount);
             verify(operationsRecord).recordOperation(depositOperation);
         }
+    }
+
+    @Test
+    void givenAmountZero_whenMinimumAmountAllowedExceptionThrown_thenAssertionSucceeds() {
+        BankAccount bankAccount = new BankAccount(operationsRecord, statementPrinting);
+        var amount = new BigDecimal("0");
+
+        Exception exception = assertThrows(MinimumAmountAllowedException.class, () -> bankAccount.deposit(amount));
+
+        String expectedMessage = "The amount allowed for this operation should be different of 0";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 }

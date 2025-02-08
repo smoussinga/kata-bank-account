@@ -1,3 +1,4 @@
+import exceptions.MinimumAmountAllowedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -17,7 +18,7 @@ public class BankAccountAcceptanceTest {
     StatementPrinting statementPrinting;
 
     @Test
-    public void should_print_a_statement_with_all_withdrawal_operations() {
+    public void should_print_a_statement_with_all_withdrawal_operations() throws MinimumAmountAllowedException {
         Account bankAccount = new BankAccount(operationsRecord, statementPrinting);
 
         bankAccount.deposit(BigDecimal.valueOf(2000));
