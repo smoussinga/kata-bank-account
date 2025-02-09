@@ -1,3 +1,4 @@
+import exceptions.InsufficientFundsForWithdrawalException;
 import exceptions.MinimumAmountAllowedException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,7 +62,7 @@ public class BankAccountTest {
     }
 
     @Test
-    public void givenOperations_whenWithdrawal_thenRecordOperation() throws MinimumAmountAllowedException {
+    public void givenOperations_whenWithdrawal_thenRecordOperation() throws MinimumAmountAllowedException, InsufficientFundsForWithdrawalException {
         LocalDateTime currentDate = LocalDateTime.now();
         var firstOperation = new Operation(currentDate, new Amount(1000));
         var secondOperation = new Operation(currentDate.plusHours(1), new Amount(2000));
@@ -90,6 +91,22 @@ public class BankAccountTest {
             assertEquals(BigDecimal.valueOf(-200), firstWithdrawalAmountValue);
             assertEquals(0, firstWithdrawalAmountValue.compareTo(fourthOperationAmountValue));
         }
+    }
+
+    @Test
+    void givenAmountGreaterThanBalance_whenInsufficientFundsForWithdrawalExceptionThrown_thenAssertionSucceeds() {
+        Operations givenOperationsRecord = new Operations();
+        LocalDateTime currentDate = LocalDateTime.now();
+        var firstOperation = new Operation(currentDate, new Amount(1000));
+        givenOperationsRecord.recordOperation(firstOperation);
+        BankAccount bankAccount = new BankAccount(givenOperationsRecord, statementPrinting);
+        var withdrawalAmount = new Amount(BigDecimal.valueOf(1000.01));
+
+        Exception exception = assertThrows(InsufficientFundsForWithdrawalException.class, () -> bankAccount.withdraw(withdrawalAmount));
+
+        String expectedMessage = "The balance funds is insufficient for the withdrawal amount";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
