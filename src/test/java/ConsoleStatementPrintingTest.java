@@ -39,18 +39,18 @@ public class ConsoleStatementPrintingTest {
     }
 
     @Test
-    void givenDepositOperations_whenPrintStatement_thenPrintStatementTitleAndDepositOperations() {
+    void givenOperations_whenPrintStatement_thenPrintStatementTitleAndAllOperations() {
         ConsoleStatementPrinting statementPrinting = new ConsoleStatementPrinting();
         LocalDateTime dateTime = LocalDate.of(2025, Month.FEBRUARY, 1).atStartOfDay();
-        List<Operation> depositOperations = new ArrayList<>();
-        depositOperations.add(new Operation(dateTime, new Amount(100)));
-        depositOperations.add(new Operation(dateTime.plusDays(2), new Amount(2000)));
-        depositOperations.add(new Operation(dateTime.plusDays(3), new Amount(BigDecimal.valueOf(300))));
+        List<Operation> operations = new ArrayList<>();
+        operations.add(new Operation(dateTime, new Amount(100)));
+        operations.add(new Operation(dateTime.plusDays(2), new Amount(2000)));
+        operations.add(new Operation(dateTime.plusDays(3), new Amount(BigDecimal.valueOf(-300))));
 
-        statementPrinting.printStatement(depositOperations);
+        statementPrinting.printStatement(operations);
 
         assertEquals("   Date    || Amount || Balance\n" +
-                        "04/02/2025 || 300.00 || 2 400.00\n" +
+                        "04/02/2025 || -300.00 || 1 800.00\n" +
                         "03/02/2025 || 2 000.00 || 2 100.00\n" +
                         "01/02/2025 || 100.00 || 100.00\n"
                 , outputStreamCaptor.toString());

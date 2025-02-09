@@ -15,18 +15,39 @@ public class BankAccount implements Account {
 
     @Override
     public void deposit(Amount amount) throws MinimumAmountAllowedException {
-        if(isNotValidMinimumAmount(amount.getAmountValue())){
+        if(isNotValidMinimumAmount(amount)){
             throw new MinimumAmountAllowedException();
         }
         recordOperation(amount);
     }
 
     @Override
-    public void printStatement() {
+    public void withdraw(Amount amount) throws MinimumAmountAllowedException {
+        Amount negativeAmount = negateAmount(amount);
+        if(isNotValidMinimumAmount(negativeAmount)){
+            throw new MinimumAmountAllowedException();
+        }
+        recordOperation(negativeAmount);
     }
 
-    private boolean isNotValidMinimumAmount(BigDecimal amount){
-        return amount.abs().compareTo(BigDecimal.ZERO) == 0;
+    @Override
+    public void printStatement() {
+        statementPrinting.printStatement(operationsRecord.retrieveAllOperations());
+    }
+
+    private boolean isNotValidMinimumAmount(Amount amount){
+        return amount.getAmountValue().abs().compareTo(BigDecimal.ZERO) == 0;
+    }
+
+    private Amount negateAmount(Amount amount){
+        BigDecimal amountValue = amount.getAmountValue();
+        if(amountValue.signum() < 0){
+            return amount;
+        }
+        if(amountValue.signum() > 0){
+            return new Amount(amountValue.negate());
+        }
+        return amount;
     }
 
     private void recordOperation(Amount amount) {
