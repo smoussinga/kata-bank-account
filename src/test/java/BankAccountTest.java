@@ -104,7 +104,7 @@ public class BankAccountTest {
 
         Exception exception = assertThrows(InsufficientFundsForWithdrawalException.class, () -> bankAccount.withdraw(withdrawalAmount));
 
-        String expectedMessage = "The balance funds is insufficient for the withdrawal amount";
+        String expectedMessage = "The balance fund is insufficient for the withdrawal amount";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
     }
