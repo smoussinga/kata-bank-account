@@ -1,17 +1,22 @@
+import exceptions.InsufficientFundsForWithdrawalException;
 import exceptions.MinimumAmountAllowedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
 
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class BankAccountAcceptanceTest {
@@ -22,26 +27,52 @@ public class BankAccountAcceptanceTest {
     @Mock
     StatementPrinting statementPrinting;
 
+    private final PrintStream standardOut = System.out;
+    private final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
+
+    @BeforeEach
+    public void setUp() {
+        System.setOut(new PrintStream(outputStreamCaptor));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        System.setOut(standardOut);
+    }
+
+
     @Test
-    public void should_print_a_statement_with_all_withdrawal_operations() throws MinimumAmountAllowedException {
-        Account bankAccount = new BankAccount(operationsRecord, statementPrinting);
+    void givenOperations_whenPrintStatement_thenPrintStatementTitleAndAllOperations() throws MinimumAmountAllowedException, InsufficientFundsForWithdrawalException {
+        Operations operationsRecord = new Operations();
+        ConsoleStatementPrinting statementPrinting = new ConsoleStatementPrinting();
+        LocalDateTime dateTime = LocalDate.of(2025, Month.FEBRUARY, 8).atStartOfDay();
 
-        bankAccount.deposit(Amount.toAmount(2000));
-        bankAccount.deposit(Amount.toAmount(BigDecimal.valueOf(1000.00)));
-        bankAccount.deposit(Amount.toAmount(BigDecimal.valueOf(500.50)));
-        bankAccount.deposit(Amount.toAmount(BigDecimal.valueOf(1500.50)));
+        try (MockedStatic<LocalDateTime> dateTimeMockedStatic = Mockito.mockStatic(LocalDateTime.class)) {
+            dateTimeMockedStatic.when(LocalDateTime::now)
+                    .thenReturn(dateTime)
+                    .thenReturn(dateTime.plusDays(2))
+                    .thenReturn(dateTime.plusDays(3))
+                    .thenReturn(dateTime.plusDays(4))
+                    .thenReturn(dateTime.plusDays(5));
 
-        bankAccount.printStatement();
+            BankAccount bankAccount = new BankAccount(operationsRecord, statementPrinting);
+            bankAccount.deposit(new Amount(500));
+            bankAccount.deposit(new Amount(2000));
+            bankAccount.withdraw(new Amount(BigDecimal.valueOf(-2400)));
+            bankAccount.deposit(new Amount(3900));
+            bankAccount.withdraw(new Amount(3999));
 
-        LocalDateTime dateTime = LocalDate.of(2025, Month.FEBRUARY, 1).atStartOfDay();
-        List<Operation> operations = new ArrayList<>();
-        operations.add(new Operation(dateTime, new Amount(2000)));
-        operations.add(new Operation(dateTime.plusDays(2), new Amount(1000)));
-        operations.add(new Operation(dateTime.plusDays(3), new Amount(BigDecimal.valueOf(500.50))));
-        operations.add(new Operation(dateTime.plusDays(4), new Amount(BigDecimal.valueOf(1500.50))));
+            bankAccount.printStatement();
 
-        verify(statementPrinting).printStatement(operations);
+            assertEquals("   Date    || Amount || Balance\n" +
+                            "13/02/2025 || -3 999.00 || 1.00\n" +
+                            "12/02/2025 || 3 900.00 || 4 000.00\n" +
+                            "11/02/2025 || -2 400.00 || 100.00\n" +
+                            "10/02/2025 || 2 000.00 || 2 500.00\n" +
+                            "08/02/2025 || 500.00 || 500.00\n"
+                    , outputStreamCaptor.toString());
 
+        }
     }
 
 }
